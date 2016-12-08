@@ -44,12 +44,18 @@ msg_request_id = "ID"
 msg_authenticate = "ID,{}\n"
 msg_acknowledge_id = "ACK"
 
+heartrate_index = 0
+GPS_index = 0
+previous_GPS_index = 0
+previous_heartrate_index = 0
+
 def authenticate(sock):
     """
     Authenticates the user by performing a handshake with the data collection server.
 
     If it fails, it will raise an appropriate exception.
     """
+    global heartrate_index,previous_GPS_index,previous_heartrate_index
     message = sock.recv(256).strip()
     if (message == msg_request_id):
         print("Received authentication request from the server. Sending authentication credentials...")
@@ -109,22 +115,45 @@ try:
                 previous_json = '' # reset if all were successful
                 sensor_type = data['sensor_type']
                 if (sensor_type == u"SENSOR_ACCEL"):
-                    print("Received Accelerometer data")
                     t = data['data']['t']
                     x = data['data']['x']
                     y = data['data']['y']
                     z = data['data']['z']
                     label = data['label']
-                    print(label)
-                    if label == 0 :
-                        print("Walking")
-                    if label == 1 :
-                        print("Jumping")
-                    if label == 2 :
-                        print("Sitting")
-                    if label == 3 :
-                        print("Jogging")
-                    labelled_data.append([t, x, y, z, label])
+                    hr = 0
+                    lat = 0
+                    log = 0
+                    # if label == 0 :
+                    #     print("Walking")
+                    # if label == 1 :
+                    #     print("Jumping")
+                    # if label == 2 :
+                    #     print("Sitting")
+                    # if label == 3 :
+                    #     print("Jogging")
+                    heartrate_index += 1
+                    GPS_index += 1
+                    labelled_data.append([t, x, y, z,hr,lat,log,label])
+
+                if(sensor_type == u"SENSOR_HEARTBEAT"):
+                    currentHeartrateIndex = heartrate_index
+                    print("Get a heartbeat, my previous heartbeat index is {}, my currentHeartrateIndex is  {}"
+                    .format(previous_heartrate_index,currentHeartrateIndex))
+                    for i in range(previous_heartrate_index,currentHeartrateIndex):
+                            newValue = data['data']['heartbeat']
+                            labelled_data[i][4] = newValue
+                    previous_heartrate_index = currentHeartrateIndex
+
+                if(sensor_type == u"SENSOR_GPS"):
+                    currentGPSIndex = GPS_index
+                    print("Get a GPS data, my previous GPS index is {}, my Current GPS index is  {}"
+                    .format(previous_GPS_index,currentGPSIndex))
+                    for i in range(previous_GPS_index,currentGPSIndex):
+                        newLat = data['data']['latitude']
+                        newLong = data['data']['longitude']
+                        labelled_data[i][5] = newLat
+                        labelled_data[i][6] = newLong
+                    previous_GPS_index = currentGPSIndex
 
             sys.stdout.flush()
         except KeyboardInterrupt:
@@ -143,6 +172,7 @@ except KeyboardInterrupt:
     # occurs when the user presses Ctrl-C
     print("User Interrupt. Saving labelled data...")
     labelled_data = np.asarray(labelled_data)
+    print(labelled_data[:10,4:]);
     np.savetxt("my-activity-data.csv", labelled_data, delimiter=",")
 finally:
     print >>sys.stderr, 'closing socket for receiving data'
