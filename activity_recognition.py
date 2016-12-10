@@ -63,13 +63,13 @@ def predict(window):
         onActivityDetected("Walking")
         print("Walking")
     if activity[0] == 1 :
-        onActivityDetected("Jumping")
+        onActivityDetected("Running")
         print("Jumping")
     if activity[0] == 2 :
         onActivityDetected("Sitting")
         print("Sitting")
     if activity[0] == 3 :
-        onActivityDetected("Jogging")
+        onActivityDetected("Driving")
         print("Jogging")
     return
 
