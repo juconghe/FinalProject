@@ -50,28 +50,28 @@ def onActivityDetected(activity):
     """
     send_socket.send(json.dumps({'user_id' : user_id, 'sensor_type' : 'SENSOR_SERVER_MESSAGE', 'message' : 'ACTIVITY_DETECTED', 'data': {'activity' : activity}}) + "\n")
 
-# def predict(window):
-#     """
-#     Given a window of accelerometer data, predict the activity label.
-#     Then use the onActivityDetected(activity) function to notify the
-#     Android must use the same feature extraction that you used to
-#     train the model.
-#     """
-#     x = extract_features(window)
-#     activity = classifier.predict(x)
-#     if activity[0] == 0 :
-#         onActivityDetected("Walking")
-#         print("Walking")
-#     if activity[0] == 1 :
-#         onActivityDetected("Jumping")
-#         print("Jumping")
-#     if activity[0] == 2 :
-#         onActivityDetected("Sitting")
-#         print("Sitting")
-#     if activity[0] == 3 :
-#         onActivityDetected("Jogging")
-#         print("Jogging")
-#     return
+def predict(window):
+    """
+    Given a window of accelerometer data, predict the activity label.
+    Then use the onActivityDetected(activity) function to notify the
+    Android must use the same feature extraction that you used to
+    train the model.
+    """
+    x = extract_features(window)
+    activity = classifier.predict(x)
+    if activity[0] == 0 :
+        onActivityDetected("Walking")
+        print("Walking")
+    if activity[0] == 1 :
+        onActivityDetected("Jumping")
+        print("Jumping")
+    if activity[0] == 2 :
+        onActivityDetected("Sitting")
+        print("Sitting")
+    if activity[0] == 3 :
+        onActivityDetected("Jogging")
+        print("Jogging")
+    return
 
 
 
@@ -140,8 +140,8 @@ try:
     previous_json = ''
 
     sensor_data = []
-    window_size = 25 # ~1 sec assuming 25 Hz sampling rate
-    step_size = 25 # no overlap
+    window_size = 125 # ~1 sec assuming 25 Hz sampling rate
+    step_size = 125 # no overlap
     index = 0 # to keep track of how many samples we have buffered so far
     reset_vars() # resets orientation variables
 
@@ -172,7 +172,7 @@ try:
                             sensor_data.pop(0)
                             if (index >= step_size and len(sensor_data) == window_size):
                                 print(np.shape(np.asarray(sensor_data[:])))
-                                # t = threading.Thread(target=predict, args=(np.asarray(sensor_data[:]),))
+                                t = threading.Thread(target=predict, args=(np.asarray(sensor_data[:]),))
                                 t.start()
                                 index = 0
 
