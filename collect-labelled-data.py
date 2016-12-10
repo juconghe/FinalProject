@@ -123,11 +123,11 @@ try:
                     # if label == 0 :
                     #     print("Walking")
                     # if label == 1 :
-                    #     print("Jumping")
+                    #     print("Running")
                     # if label == 2 :
                     #     print("Sitting")
                     # if label == 3 :
-                    #     print("Jogging")
+                    #     print("Driving")
                     if fix_index != 0:
                         labelled_data.append([t, x, y, z,hr,lat,log,label])
 

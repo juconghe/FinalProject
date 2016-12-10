@@ -109,10 +109,9 @@ for i,window_with_timestamp_and_label in slidingWindow(data, window_size, step_s
     # append features:
     X = np.append(X, np.reshape(x, (1,-1)), axis=0)
     # append label:
-    print(window_with_timestamp_and_label[10, -1])
-    y = np.append(y, window_with_timestamp_and_label[10, -1])
-    print("Getting label")
-    print(np.shape(y))
+    y = np.append(y, window_with_timestamp_and_label[50, -1])
+    # print("Getting label")
+    # print(np.shape(y))
 
 print("Finished feature extraction over {} windows".format(len(X)))
 print("Unique labels found: {}".format(set(y)))
@@ -146,7 +145,7 @@ sys.stdout.flush()
 
 n = len(y)
 n_classes = len(class_names)
-
+sum_conf = []
 # TODO: Train and evaluate your decision tree classifier over 10-fold CV.
 # Report average accuracy, precision and recall metrics.
 tree  =   DecisionTreeClassifier ( criterion = "entropy" ,  max_depth = 3)
@@ -158,119 +157,32 @@ for i, (train_indexes, test_indexes) in enumerate(cv):
     X_test = X[test_indexes, :]
     y_test = y[test_indexes]
     tree.fit(X_train, y_train)
-    print(X_test)
     y_pred = tree.predict(X_test)
-    conf = confusion_matrix(y_test,y_pred)
-    print(conf)
+    if(sum_conf == []):
+        sum_conf = confusion_matrix(y_test,y_pred)
+    else:
+        sum_conf += confusion_matrix(y_test,y_pred)
+    print(sum_conf)
 
-sum_accuracy = []
-sum_precision = []
-sum_recall = []
-accuracy = sum(np.diagonal(conf))/(np.sum(conf)*1.0)
-precision_stationary= (conf[0,0]/(sum(conf[:, 0]*1.0)))
-print("Precision of Stationary is {}".format(precision_stationary))
-precision_walking = (conf[1,1]/(sum(conf[:, 1])*1.0))
-print("Precision of walking is {}".format(precision_walking))
-recall_stationary = (conf[0,0]/(sum(conf[0])*1.0))
-print("Recall of Stationary is {}".format(recall_stationary))
-recall_walking = (conf[1,1]/(sum(conf[1])*1.0))
-print("Recall of walking is {}".format(recall_walking))
-sum_output = []
+accuracy = sum(np.diagonal(sum_conf))/(np.sum(sum_conf)*1.0)
+print("Average accuracy is {}".format(accuracy))
+precision_Walking= sum_conf[0,0]/(sum(sum_conf[:, 0])*1.0)
+print("Precision of Walking Speaking is {}".format(precision_Walking))
+recall_Walking = sum_conf[0,0]/(sum(sum_conf[0])*1.0)
+print("Recall of Walking Speaking is {}".format(recall_Walking))
+precision_Running = sum_conf[1,1]/(sum(sum_conf[:, 1])*1.0)
+print("Precision of Running is {}".format(precision_Running))
+recall_Running= sum_conf[1,1]/(sum(sum_conf[1])*1.0)
+print("Recall of Running is {}".format(recall_Running))
+precision_Sitting = sum_conf[2,2]/(sum(sum_conf[:, 2])*1.0)
+print("Precision of Sitting is {}".format(precision_Sitting))
+recall_Sitting = sum_conf[2,2]/(sum(sum_conf[2])*1.0)
+print("Recall of Sitting is {}".format(recall_Sitting))
+precision_Driving = sum_conf[3,3]/(sum(sum_conf[:, 3])*1.0)
+print("Precision of Sitting is {}".format(precision_Driving))
+recall_Sitting = sum_conf[3,3]/(sum(sum_conf[3])*1.0)
+print("Recall of Sitting is {}".format(recall_Sitting))
 
-sum_output.append(accuracy)
-sum_accuracy.append(accuracy)
-
-sum_output.append(precision_walking)
-sum_precision.append(precision_walking)
-sum_output.append(precision_walking)
-sum_precision.append(precision_walking)
-
-sum_output.append(recall_stationary)
-sum_recall.append(recall_stationary)
-sum_output.append(recall_walking)
-sum_recall.append(recall_walking)
-
-
-for index in range(len(sum_output)):
-        if np.isnan(sum_output[index]):
-            sum_output[index] = 0
-
-for index in range(len(sum_accuracy)):
-            if np.isnan(sum_accuracy[index]):
-                sum_accuracy[index] = 0
-
-for index in range(len(sum_precision)):
-            if np.isnan(sum_precision[index]):
-                sum_precision[index] = 0
-
-for index in range(len(sum_recall)):
-            if np.isnan(sum_recall[index]):
-                sum_recall[index] = 0
-
-print("the average of accuracy is {}".format(np.mean(sum_accuracy)))
-print("the average of precision is {}".format(np.mean(sum_precision)))
-print("the average of recall is {}".format(np.mean(sum_recall)))
-
-
-# TODO: Evaluate another classifier, i.e. SVM, Logistic Regression, k-NN, etc.
-#SVM
-svc = svm.LinearSVC()
-for i, (train_indexes, test_indexes) in enumerate(cv):
-        print("Fold {} : The confusion matrix is :".format(i))
-        X_train = X[train_indexes, :]
-        y_train = y[train_indexes]
-        X_test = X[test_indexes, :]
-        y_test = y[test_indexes]
-        svc.fit(X_train,y_train)
-        y_pred = svc.predict(X_test)
-        conf = confusion_matrix(y_test,y_pred)
-        print(conf)
-sum_accuracy = []
-sum_precision = []
-sum_recall = []
-accuracy = sum(np.diagonal(conf))/(np.sum(conf)*1.0)
-precision_stationary= (conf[0,0]/(sum(conf[:, 0]*1.0)))
-print("Precision of Stationary is {}".format(precision_stationary))
-precision_walking = (conf[1,1]/(sum(conf[:, 1])*1.0))
-print("Precision of walking is {}".format(precision_walking))
-recall_stationary = (conf[0,0]/(sum(conf[0])*1.0))
-print("Recall of Stationary is {}".format(recall_stationary))
-recall_walking = (conf[1,1]/(sum(conf[1])*1.0))
-print("Recall of walking is {}".format(recall_walking))
-
-sum_output.append(accuracy)
-sum_accuracy.append(accuracy)
-
-sum_output.append(precision_walking)
-sum_precision.append(precision_walking)
-sum_output.append(precision_walking)
-sum_precision.append(precision_walking)
-
-sum_output.append(recall_stationary)
-sum_recall.append(recall_stationary)
-sum_output.append(recall_walking)
-sum_recall.append(recall_walking)
-
-
-for index in range(len(sum_output)):
-        if np.isnan(sum_output[index]):
-            sum_output[index] = 0
-
-for index in range(len(sum_accuracy)):
-            if np.isnan(sum_accuracy[index]):
-                sum_accuracy[index] = 0
-
-for index in range(len(sum_precision)):
-            if np.isnan(sum_precision[index]):
-                sum_precision[index] = 0
-
-for index in range(len(sum_recall)):
-            if np.isnan(sum_recall[index]):
-                sum_recall[index] = 0
-
-print("the average of accuracy is {}".format(np.mean(sum_accuracy)))
-print("the average of precision is {}".format(np.mean(sum_precision)))
-print("the average of recall is {}".format(np.mean(sum_recall)))
 
 # TODO: Once you have collected data, train your best model on the entire
 # dataset. Then save it to disk as follows:
@@ -278,6 +190,6 @@ tree.fit(X, y)
 export_graphviz (tree ,out_file = 'tree.dot' ,  feature_names  =  feature_names)
 
 # when ready, set this to the best model you found, trained on all the data:
-best_classifier = svc
+best_classifier = tree
 with open('classifier.pickle', 'wb') as f: # 'wb' stands for 'write bytes'
     pickle.dump(best_classifier, f)

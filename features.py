@@ -106,45 +106,19 @@ def _compute_peak_features(window):
     zPeak = compute_peak(zArray)
     return np.array([[xPeak],[yPeak],[zPeak]])
 
-
-
-
-"""
-	public double distance(GPSLocation other) {
-		double deltaLatitude = other.latitude - this.latitude;
-		double deltaLongitude = other.longitude - this.longitude;
-
-		//convert change in latitude and longitude to radians
-		double dLat = Math.toRadians(deltaLatitude);
-		double dLng = Math.toRadians(deltaLongitude);
-
-		//compute the haversine of the latitude and longitude deltas
-		double haversinLat = (1 - Math.cos(dLat))/2;
-		double haversinLng = (1 - Math.cos(dLng))/2;
-
-		//compute the haversine of the central angle between the two points
-		double haversinCentralAngle = haversinLat + Math.cos(Math.toRadians(this.latitude)) * Math.cos(Math.toRadians(other.longitude)) *  haversinLng;
-
-		//inverse the haversine function using the arctan to get the distance as a measure of the angle difference
-		double d = 2 * Math.atan2(Math.sqrt(haversinCentralAngle), Math.sqrt(1-haversinCentralAngle));
-
-		//We want to compute the arc length s=r*d, so simply multiply by the radius
-		return RADIUS_OF_EARTH_IN_METERS * d;
-	}
-"""
 def _compute_location_distance(window):
     global lastLatitude,lastLongtitude
-    latitude = np.median(window[:,5])
-    longtitude = np.median(window[:,6])
-    if latitude && lastLatitude == 0:
+    latitude = np.median(window[:,4])
+    longtitude = np.median(window[:,5])
+    if (latitude==0 and lastLatitude==0):
         lastLatitude = latitude
         lastLongtitude = longtitude
 
     diffLat = math.radians(latitude - lastLatitude)
     diffLong = math.radians(longtitude - lastLongtitude)
+    haversinLng = (1 - math.cos(diffLong))/2
     haversinLat = (1 - math.cos(diffLat))/2
-	haversinLng = (1 - math.cos(diffLong))/2
-    haversinCentralAngle = haversinLat + math.cos(math.radians(latitude))*
+    haversinCentralAngle = haversinLat + math.cos(math.radians(latitude))
     math.cos(math.radians(lastLongtitude)) * haversinLng
     d = 2 * math.atan2(math.sqrt(haversinCentralAngle),math.sqrt(1-haversinCentralAngle))
     lastLatitude = latitude
