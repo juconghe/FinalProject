@@ -18,6 +18,7 @@ import json
 import threading
 import numpy as np
 import pickle
+from features import extract_features # make sure features.py is in the same directory
 from util import reorient, reset_vars,slidingWindow
 
 # TODO: Replace the string with your user ID
@@ -165,7 +166,7 @@ try:
                     z=data['data']['z']
 
                     if fix_index != 0:
-                        sensor_data.append(reorient(x,y,z,hr,lat,log))
+                        sensor_data.append([x,y,z,hr,lat,log])
                         index+=1
                         # make sure we have exactly window_size data points :
                         while len(sensor_data) > window_size:
@@ -177,12 +178,11 @@ try:
                                 index = 0
 
                 if(sensor_type == u"SENSOR_HEARTBEAT"):
-                    print("Get a heartbeat")
                     hr = data['data']['heartbeat']
 
                 if(sensor_type == u"SENSOR_GPS"):
-                    print("Get GPS data")
                     if fix_index == 0 :
+                        print("Start classif")
                         fix_index = 1
                     lat = data['data']['latitude']
                     log = data['data']['longitude']
