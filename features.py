@@ -16,6 +16,7 @@ it is still publicly accessible).
 
 import numpy as np
 import math
+from geopy.distance import vincenty
 
 lastLatitude = 0
 lastLongtitude = 0
@@ -108,26 +109,23 @@ def _compute_peak_features(window):
 
 def _compute_location_distance(window):
     global lastLatitude,lastLongtitude
+    # print("My last latitude is {}, my last longtitude is {}".format(lastLatitude,lastLongtitude))
     latitude = np.median(window[:,4])
     longtitude = np.median(window[:,5])
-    if (latitude==0 and lastLatitude==0):
+    # print("My Current latitude is {}, my Current longtitude is {}".format(latitude,longtitude))
+    if (lastLatitude==0 and lastLatitude==0):
         lastLatitude = latitude
         lastLongtitude = longtitude
-
-    diffLat = math.radians(latitude - lastLatitude)
-    diffLong = math.radians(longtitude - lastLongtitude)
-    haversinLng = (1 - math.cos(diffLong))/2
-    haversinLat = (1 - math.cos(diffLat))/2
-    haversinCentralAngle = haversinLat + math.cos(math.radians(latitude))
-    math.cos(math.radians(lastLongtitude)) * haversinLng
-    d = 2 * math.atan2(math.sqrt(haversinCentralAngle),math.sqrt(1-haversinCentralAngle))
-    lastLatitude = latitude
-    lastLongtitude = longtitude
-    return 6371000 * d
-
+    lastCoordinate = (lastLatitude,lastLongtitude)
+    currentCoordinate = (latitude,longtitude)
+    distance = vincenty(lastCoordinate, currentCoordinate).meters
+    # print("Computed distance is {}".format(distance))
+    return distance
 
 def _compute_heartRate(window):
-    return np.mean(window[:,3])
+    heartRate = np.median(window[:,3])
+    # print("Computed heartRate is {}".format(heartRate))
+    return heartRate
 
 
 
@@ -146,17 +144,17 @@ def extract_features(window):
 
     x = []
 
-    x = np.append(x, _compute_mean_features(window))
+    # x = np.append(x, _compute_mean_features(window))
     x = np.append(x,_compute_variance_features(window))
     x = np.append(x,_compute_min_features(window))
     x = np.append(x,_compute_max_features(window))
-    x = np.append(x,_compute_median_features(window))
-    x = np.append(x,_compute_zero_crossing_features(window))
+    # x = np.append(x,_compute_median_features(window))
+    # x = np.append(x,_compute_zero_crossing_features(window))
     x = np.append(x,_compute_mean_crossing_features(window))
     x = np.append(x,_compute_FFT_features(window))
     x = np.append(x,_compute_mean_magnitude_singal(window))
     x = np.append(x,_compute_entropy(window))
-    x = np.append(x,_compute_peak_features(window))
+    # x = np.append(x,_compute_peak_features(window))
     x = np.append(x,_compute_location_distance(window))
     x = np.append(x,_compute_heartRate(window))
 

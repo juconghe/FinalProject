@@ -73,24 +73,29 @@ sys.stdout.flush()
 # -----------------------------------------------------------------------------
 
 # you may want to play around with the window and step sizes
-window_size = 100
-step_size = 100
+window_size = 125
+step_size = 125
 
 # sampling rate for the sample data should be about 25 Hz; take a brief window to confirm this
 # n_samples = 1000
 # time_elapsed_seconds = (data[n_samples,0] - data[0,0]) / 1000
 # sampling_rate = n_samples / time_elapsed_seconds
 
-feature_names = ["mean X", "mean Y", "mean Z",
+
+# "medianX","medianY","medianZ",
+# "meanCX","meanCY","meanCZ",
+# "PeakX","PeakY","PeakZ",
+# "mean X", "mean Y", "mean Z",
+#  "zeroX","zeroY","zeroZ",
+
+feature_names = [
                  "Variance X","Variance Y", "Variance Z",
-                 "minX","minY","minZ",
                  "maxX","maxY","maxZ",
-                 "medianX","medianY","medianZ",
-                 "zeroX","zeroY","zeroZ",
+                 "minX","minY","minZ",
                  "meanCX","meanCY","meanCZ",
                  "FFTX","FFTY","FFTZ",
-                 "magnitude","entropy","PeakX",
-                 "PeakY","PeakZ","location_distance","mean_heartRate"]
+                 "entropy","magnitude",
+                 "location_distance","mean_heartRate"]
 class_names = ["Walking", "Running","Sitting","Driving"]
 
 print("Extracting features and labels for window size {} and step size {}...".format(window_size, step_size))
@@ -151,7 +156,7 @@ sum_conf = []
 tree  =   DecisionTreeClassifier ( criterion = "entropy" ,  max_depth = 3)
 cv = cross_validation.KFold(n, n_folds=10, shuffle=True, random_state=None)
 for i, (train_indexes, test_indexes) in enumerate(cv):
-    print("Fold {} : The confusion matrix is :".format(i))
+    # print("Fold {} : The confusion matrix is :".format(i))
     X_train = X[train_indexes, :]
     y_train = y[train_indexes]
     X_test = X[test_indexes, :]
@@ -167,9 +172,9 @@ for i, (train_indexes, test_indexes) in enumerate(cv):
 accuracy = sum(np.diagonal(sum_conf))/(np.sum(sum_conf)*1.0)
 print("Average accuracy is {}".format(accuracy))
 precision_Walking= sum_conf[0,0]/(sum(sum_conf[:, 0])*1.0)
-print("Precision of Walking Speaking is {}".format(precision_Walking))
+print("Precision of Walking  is {}".format(precision_Walking))
 recall_Walking = sum_conf[0,0]/(sum(sum_conf[0])*1.0)
-print("Recall of Walking Speaking is {}".format(recall_Walking))
+print("Recall of Walking  is {}".format(recall_Walking))
 precision_Running = sum_conf[1,1]/(sum(sum_conf[:, 1])*1.0)
 print("Precision of Running is {}".format(precision_Running))
 recall_Running= sum_conf[1,1]/(sum(sum_conf[1])*1.0)
@@ -179,9 +184,9 @@ print("Precision of Sitting is {}".format(precision_Sitting))
 recall_Sitting = sum_conf[2,2]/(sum(sum_conf[2])*1.0)
 print("Recall of Sitting is {}".format(recall_Sitting))
 precision_Driving = sum_conf[3,3]/(sum(sum_conf[:, 3])*1.0)
-print("Precision of Sitting is {}".format(precision_Driving))
-recall_Sitting = sum_conf[3,3]/(sum(sum_conf[3])*1.0)
-print("Recall of Sitting is {}".format(recall_Sitting))
+print("Precision of Driving is {}".format(precision_Driving))
+recall_Driving = sum_conf[3,3]/(sum(sum_conf[3])*1.0)
+print("Recall of Driving is {}".format(recall_Sitting))
 
 
 # TODO: Once you have collected data, train your best model on the entire
