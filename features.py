@@ -42,9 +42,6 @@ def _compute_min_features(window):
 def _compute_max_features(window):
     return np.amax(window[:,:3],axis=0)
 
-def _compute_median_features(window):
-    return np.median(window[:,:3],axis=0)
-
 def _compute_zero_crossing_features(window):
     xArray = window[:,0]
     yArray = window[:,1]
@@ -52,16 +49,6 @@ def _compute_zero_crossing_features(window):
     xCrossingRate = compute_crossing(xArray)
     yCrossingRate = compute_crossing(yArray)
     zCrossingRate = compute_crossing(zArray)
-    return np.array([[xCrossingRate],[yCrossingRate],[zCrossingRate]])
-
-def _compute_mean_crossing_features(window):
-    meanArray = _compute_mean_features(window)
-    xArray = window[:,0]
-    yArray = window[:,1]
-    zArray = window[:,2]
-    xCrossingRate = compute_crossing(xArray-meanArray[0])
-    yCrossingRate = compute_crossing(yArray-meanArray[1])
-    zCrossingRate = compute_crossing(zArray-meanArray[2])
     return np.array([[xCrossingRate],[yCrossingRate],[zCrossingRate]])
 
 def _compute_mean_magnitude_singal(window):
@@ -97,15 +84,6 @@ def compute_peak(window):
             if(i+1>i):
                 status = "increasing"
     return counter
-
-def _compute_peak_features(window):
-    xArray = window[:,0]
-    yArray = window[:,1]
-    zArray = window[:,2]
-    xPeak = compute_peak(xArray)
-    yPeak = compute_peak(yArray)
-    zPeak = compute_peak(zArray)
-    return np.array([[xPeak],[yPeak],[zPeak]])
 
 def _compute_location_distance(window):
     global lastLatitude,lastLongtitude
@@ -144,17 +122,13 @@ def extract_features(window):
 
     x = []
 
-    # x = np.append(x, _compute_mean_features(window))
     x = np.append(x,_compute_variance_features(window))
     x = np.append(x,_compute_min_features(window))
     x = np.append(x,_compute_max_features(window))
-    # x = np.append(x,_compute_median_features(window))
-    # x = np.append(x,_compute_zero_crossing_features(window))
-    x = np.append(x,_compute_mean_crossing_features(window))
+    x = np.append(x,_compute_zero_crossing_features(window))
     x = np.append(x,_compute_FFT_features(window))
     x = np.append(x,_compute_mean_magnitude_singal(window))
     x = np.append(x,_compute_entropy(window))
-    # x = np.append(x,_compute_peak_features(window))
     x = np.append(x,_compute_location_distance(window))
     x = np.append(x,_compute_heartRate(window))
 
